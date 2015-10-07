@@ -2,7 +2,7 @@ PopHealth::Application.routes.draw do
 
   apipie
 
-  devise_for :users, :controllers => {:registrations => "registrations"}
+  # devise_for :users, :controllers => {:registrations => "registrations"}
 
   get "admin/users"
   post "admin/promote"
@@ -26,15 +26,15 @@ PopHealth::Application.routes.draw do
   post 'admin/set_user_practice_provider'
   post "teams/:id/update", :to => 'teams#update'
   post "teams/create"
-  post "teams/create_default" 
+  post "teams/create_default"
   get 'home/check_authorization'
   delete "practices/remove_patients"
   delete "practices/remove_providers"
-   
+
   root :to => 'home#index'
 
-  resources :practices 
-  
+  resources :practices
+
   resources :providers do
     resources :patients do
       collection do
@@ -51,7 +51,15 @@ PopHealth::Application.routes.draw do
 
   resources :teams
 
-  namespace :api do
+  namespace :api, as: nil, defaults: { format: 'json' } do
+    devise_for :users, {
+      controllers: {
+        registrations: 'api/registrations'
+      }
+    }
+  end
+
+  namespace :api, defaults: { format: 'json' } do
     get 'reports/qrda_cat3.xml', :to =>'reports#cat3', :format => :xml
     get 'reports/cat1/:id/:measure_ids', :to =>'reports#cat1', :format => :xml
     get 'teams/team_providers/:id', :to => 'teams#team_providers'
@@ -59,7 +67,7 @@ PopHealth::Application.routes.draw do
     get 'reports/measures_spreadsheet', :to =>'reports#measures_spreadsheet'
     get 'teams/team_providers/:id', :to => 'teams#team_providers'
     get 'reports/team_report', :to => 'reports#team_report'
-    
+
     resources :practices
     resources :teams
     namespace :admin do
